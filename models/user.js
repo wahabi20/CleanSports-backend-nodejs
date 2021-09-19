@@ -14,12 +14,14 @@ const UserSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-     
       unique: true,
     },
     address: {
       type: String,
       
+    },
+    pts:{
+      type: Number
     },
     logo:{
       type: String,
@@ -90,6 +92,7 @@ function validateUser(user) {
     address: Joi.string().min(5).max(100).required(),
     dateOfBirth: Joi.string().min(5).max(50).required(),
     phone_Number: Joi.number().required(),
+    pts: Joi.number()
   };
   return Joi.validate(user, schema);
 }
