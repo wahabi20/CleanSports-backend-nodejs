@@ -1,0 +1,8 @@
+# Node Dependencies 
+/node_modules
+
+# Data Base Config 
+/config
+
+# .env 
+/.env 
