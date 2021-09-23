@@ -40,8 +40,17 @@ const storage = multer.diskStorage({
   });
 
 
+
+
+/* forgot password  */
+router.put("/forgot-password", userController.forgotPassword)
+
+/* reset Password */
+router.put("/reset/:token", userController.resetPassword);
+
 /* get all the users */
 router.get('/', auth, userController.getUsers);
+
 /* add user  */
 router.post("/register", upload.single('logo'), userController.addUser);
  

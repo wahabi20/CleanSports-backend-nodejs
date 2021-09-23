@@ -1,10 +1,10 @@
 
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const { User, validate } = require("../models/user");
 const { ObjectID } = require("mongodb");
-
-
 
 
 /* add user  */
@@ -110,7 +110,6 @@ module.exports.getUser = async (req, res) => {
 }
 
 /* update user */
-
 module.exports.updateUser = (req, res) => {
  
   const id = req.params.id;
@@ -122,8 +121,7 @@ module.exports.updateUser = (req, res) => {
     _id: id,
   })
     .then(async (user) => {
-    // console.log(user)
-     
+ 
    if( typeof req.file === 'undefined' || req.file.length === 0){
      const default_logo = user.logo
      await user.set("logo", default_logo);
@@ -132,7 +130,6 @@ module.exports.updateUser = (req, res) => {
       const logo =  req.file.filename;
       await user.set('logo',logo); 
    }
- 
       user.set("first_Name", req.body.first_Name);
       user.set("last_Name", req.body.last_Name);
       user.set("email", req.body.email);
@@ -148,9 +145,7 @@ module.exports.updateUser = (req, res) => {
     });
  }
  
- 
 
- 
 /* delete user */
 module.exports.deleteUser = async (req, res) => {
   const id = req.params.id;
@@ -171,3 +166,120 @@ module.exports.deleteUser = async (req, res) => {
       res.status(404).send(errors);   
     });
 }
+
+
+
+/* forgot password  */
+module.exports.forgotPassword = async (req, res) => {
+
+  const {email} = req.body;
+
+  User.findOne({email}).then(user => {
+
+    if (!user){
+       return res.status(400).json({err: "User with this email does not exists."});
+    }
+   
+    const token = jwt.sign({_id: user._id},process.env.RESET_PASSWORD_KEY, {expiresIn: '20m'});
+
+
+  let mailOption = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: 'Reset password',
+    html: `
+    <div><h2>Please click on given link to reset your password</h2>
+    <pre>http://localhost:4200/users/reset?token=${token}</pre>
+    </div>
+    
+   `
+  }
+
+ //console.log("token>>>", token)
+
+  return user.updateOne({resetLink: token}).then(result => {
+  
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
+
+      }
+    });
+
+    transporter.sendMail(mailOption)
+    .then( resonse => {
+       res.status(200).json({
+          message: 'Email has been sent',
+          token : token
+       });
+    }).catch(error => {
+       res.status(400).send(error);
+    })
+  })
+  
+})
+ 
+      
+
+}
+
+
+
+ /* reset Password */
+module.exports.resetPassword = async (req, res) => {
+
+  const {newPass, newPassConfirm} = req.body;
+  const resetLink = req.params;
+  let resetLink_token = resetLink.token;
+   console.log("token>>>",resetLink_token)
+  
+  if(resetLink.token){
+     
+       jwt.verify(resetLink.token,process.env.RESET_PASSWORD_KEY, function (error, decodedData){
+         if(error){
+             return res.status(401).json({
+               error: "Incorrect token or it is expired"
+             })
+         }
+
+        User.findOne({resetLink: resetLink_token}).then( async user => {
+       
+           if(!user){
+              return res.status(400).json({
+                error: "User with this token does not exist"
+              });
+           }
+          
+  
+     const us = await User.findByIdAndUpdate(
+          { _id: user._id },
+          { password: newPass , 
+            resetLink: '',
+            password_Confirm : newPassConfirm
+          },
+          { new: true }
+        );
+
+          const salt = await bcrypt.genSalt(10);
+          us.password = await bcrypt.hash(us.password, salt);
+          us.password_Confirm = await bcrypt.hash(us.password_Confirm, salt);
+         
+           us.save().then(response => {
+              res.status(200).json({ message: "Your password has been changed"});
+           }).catch(err => {
+              res.status(400).json({ error: "reset password error"});
+           })
+           
+
+        })
+       })
+
+      
+     }else {
+        console.log("error: resetLink not exist!");
+     }
+  }
+

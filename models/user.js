@@ -21,7 +21,8 @@ const UserSchema = new mongoose.Schema(
       
     },
     pts:{
-      type: Number
+      type: Number,
+      default: 0
     },
     logo:{
       type: String,
