@@ -184,7 +184,7 @@ module.exports.forgotPassword = async (req, res) => {
 
 
   let mailOption = {
-    from: process.env.EMAIL,
+    from: 'wahabi.contact.tech@gmail.com',
     to: email,
     subject: 'Reset password',
     html: `
