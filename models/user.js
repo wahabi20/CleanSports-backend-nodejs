@@ -52,6 +52,7 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    isbn: {type: String, index: true}, 
     teamId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",

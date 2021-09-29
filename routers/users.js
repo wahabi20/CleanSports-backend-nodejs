@@ -42,6 +42,10 @@ const storage = multer.diskStorage({
 
 
 
+/*search user by caracters  */
+router.get('/searchuser', auth, userController.getSearchUsers);
+
+
 /* forgot password  */
 router.put("/forgot-password", userController.forgotPassword)
 
