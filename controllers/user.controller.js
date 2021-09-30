@@ -291,6 +291,8 @@ module.exports.getSearchUsers = async (req, res) => {
   const { page = 1, limit , name} = req.query;
   console.log("name>>>",name)
      
+  if(limit == 5)
+  {
     await User.find({
       
         first_Name: {$regex: '.*' + name + '.*'},
@@ -314,5 +316,33 @@ module.exports.getSearchUsers = async (req, res) => {
       .catch((errors) => {
         res.status(404).send(errors);       
       });
+  }else 
+  {
+        await User.find({
+          
+          first_Name: {$regex: '.*' + name + '.*'},
+        
+          "isAdmin":false
+
+      })
+        .then((users) => {
+        
+          const total_pages = users.length / limit ;
+          const data = users.slice((page  - 1) * limit, page  * limit);
+          res.status(200).json([{
+              message: "list of users",
+              page: page,
+              per_page: limit,
+              total: users.length,
+              total_pages : Math.ceil(total_pages),
+              result: data
+            }])
+        })
+        .catch((errors) => {
+          res.status(404).send(errors);       
+        });
+  }
+
+    
       
   }
