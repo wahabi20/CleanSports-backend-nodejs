@@ -67,6 +67,8 @@ router.put("/:id", auth, upload.single('logo'), userController.updateUser);
 /* get user by id  */
 router.get("/:id", userController.getUser);
 
+/* desactivate a user */
+router.put("/status/:id",auth, userController.updateStatus);
 
 
 

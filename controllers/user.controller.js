@@ -55,16 +55,10 @@ module.exports.getUsers = async (req, res) => {
       "isAdmin":false
     })
       .then((users) => {
-        const total_pages = users.length / limit ;
-        const data = users.slice((page - 1) * limit, page * limit);
-         res.status(200).json({
-            message: "list of users",
-            page: page,
-            per_page: limit,
-            total: users.length,
-            total_pages : Math.ceil(total_pages),
-            result: data
-          })
+       
+         res.status(200).json(
+            users
+          )
       })
       .catch((errors) => {
         res.status(404).send(errors);       
@@ -346,3 +340,44 @@ module.exports.getSearchUsers = async (req, res) => {
     
       
   }
+
+
+  
+/* deactivate a user  */
+module.exports.updateStatus = async (req, res) => {
+  const id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send("Id not valid");
+  }
+  const isActive = req.body.isActive;
+
+ await User.findByIdAndUpdate(
+    { _id: id },
+    { isActive: isActive},
+    { new: true }
+  ).then(async user =>{
+   
+      if (!user ) {
+        return res.status(404).json({
+          message: "user not found!",
+        });
+      }
+
+     await user.save()
+    .then((result) => {
+     
+      res.status(201).json({
+        message: "Updating status successfully !",
+        UserInformations: result,
+      });
+    }).catch((errors) => {
+      res.status(404).send(errors);
+    });
+  })
+    .catch((errors) => {
+      res.status(404).send(errors);
+    });
+  
+ 
+};
