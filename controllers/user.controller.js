@@ -283,7 +283,7 @@ module.exports.resetPassword = async (req, res) => {
 module.exports.getSearchUsers = async (req, res) => {
   
   const { page = 1, limit , name} = req.query;
-  console.log("name>>>",name)
+ // console.log("name>>>",name)
      
   if(limit == 5)
   {
