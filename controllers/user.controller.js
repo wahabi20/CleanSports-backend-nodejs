@@ -310,7 +310,7 @@ module.exports.getSearchUsers = async (req, res) => {
       .catch((errors) => {
         res.status(404).send(errors);       
       });
-  }else 
+  }else if(limit == 8)
   {
         await User.find({
           
@@ -335,6 +335,24 @@ module.exports.getSearchUsers = async (req, res) => {
         .catch((errors) => {
           res.status(404).send(errors);       
         });
+  }else{
+    await User.find({
+          
+      first_Name: {$regex: '.*' + name + '.*'},
+    
+      "isAdmin":false
+
+  })
+    .then((users) => {
+    
+      res.status(200).json([{
+         
+            users
+        }])
+    })
+    .catch((errors) => {
+      res.status(404).send(errors);       
+    });
   }
 
     

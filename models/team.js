@@ -5,7 +5,6 @@ const TeamSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: false,
     },
     logo:{
         type: String,
@@ -19,6 +18,14 @@ const TeamSchema = new mongoose.Schema(
         type: Boolean,
         default: true
     },
+    nbPlayer:{
+      type: Number,
+      require:true
+    },
+    addedBy:{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     userId: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -30,6 +37,7 @@ const TeamSchema = new mongoose.Schema(
           ref: "Match",
         },
       ],
+    
   },
   { timestamps: true }
 );
@@ -41,7 +49,8 @@ function validateTeam(team) {
     name: Joi.string().min(5).max(80),
     pts: Joi.number(),
     isActive: Joi.boolean(),
-   
+    nbPlayer: Joi.number(),
+    userId:Joi.required()
   };
 
   return Joi.validate(team, schema);
