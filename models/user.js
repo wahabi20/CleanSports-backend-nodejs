@@ -52,11 +52,12 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    teamId: {
+   
+    teamId: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",
       
-    },
+    }],
     matchs: [
       {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,10 +1,8 @@
 const auth = require("../middlewares/auth");
-const multer = require('multer');
 const express = require("express");
 const router = express.Router();
-
-const userController = require('../controllers/user.controller');
-
+const multer = require('multer');
+const teamController = require('../controllers/team.controller');
 
 
 
@@ -41,37 +39,13 @@ const storage = multer.diskStorage({
 
 
 
+/* add team */
+router.post("/add", auth, upload.single('logo'), teamController.addTeam);
 
-/*search user by caracters  */
-router.get('/searchuser', auth, userController.getSearchUsers);
+/* get team by owner */
+router.get("/list", auth,teamController.getUserTeam);
 
-
-/* forgot password  */
-router.put("/forgot-password", userController.forgotPassword)
-
-/* reset Password */
-router.put("/reset/:token", userController.resetPassword);
-
-/* get all the users */
-router.get('/', auth, userController.getUsers);
-
-/* add user  */
-router.post("/register", upload.single('logo'), userController.addUser);
- 
-/* delete user by id */
-router.delete("/:id", auth, userController.deleteUser);
-
-/* update user by id*/
-router.put("/:id", auth, upload.single('logo'), userController.updateUser);
-
-/* get user by id  */
-router.get("/:id", userController.getUser);
-
-/* desactivate a user */
-router.put("/status/:id",auth, userController.updateStatus);
 
 
 
 module.exports = router;
-
-
