@@ -42,7 +42,8 @@ const storage = multer.diskStorage({
 /* add team */
 router.post("/add", auth, upload.single('logo'), teamController.addTeam);
 
-
+/* get team by owner */
+router.get("/list", auth,teamController.getUserTeam);
 
 
 

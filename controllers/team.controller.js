@@ -5,10 +5,10 @@ const {Team, validate } = require("../models/team");
 
 
 
+
+
+
 /* add new team */
-
-
-/* add service by Partner */
 module.exports.addTeam = async (req, res) => {
 
     const { error } = validate(req.body);
@@ -72,4 +72,33 @@ module.exports.addTeam = async (req, res) => {
             
         }
 
- 
+/* get team by owner */
+module.exports.getUserTeam = async (req,res) => {
+
+  try{
+      let id = req.user._id;
+      
+
+      let team = await User.findOne({_id: id }).select("-password -password_Confirm")
+      .populate([
+        {
+          path: 'teamId',
+          model: 'Team',
+          select: 'name pts nbPlayer logo',
+          populate: {
+            path: 'userId',
+            model: 'User',
+            select: 'first_Name last_Name pts logo',
+          }
+        },
+      ]);
+     
+      res.status(200).json([{
+        
+        team: team
+      }]);
+  }catch (err) {
+    res.status(500).send(err)
+  }
+  
+}

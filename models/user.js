@@ -52,9 +52,7 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    nbPlayer:{
-      type: Number
-    },
+   
     teamId: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Team",
