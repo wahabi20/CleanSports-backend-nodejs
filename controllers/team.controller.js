@@ -15,7 +15,10 @@ module.exports.addTeam = async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
    console.log("nbplayer>>>",req.body.nbPlayer) 
     
-  
+   let teamName = await Team.findOne({
+    name: req.body.name,
+  });
+  if (teamName) return res.status(400).send("team name aleardy existe.");
       
       const team = new Team({
        
