@@ -2,6 +2,8 @@ const path = require('path');
 const express = require("express");
 const cors=require("cors");
 const app = express();
+const server = require('http').createServer(app);
+const io = require('./socket/socket').init(server);
 var bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
@@ -30,10 +32,16 @@ require("./startup/config").getKeyPass();
 
 const port = process.env.PORT || 3000;
 
- app.listen(port, () => console.log(`connected with port ${port} ...`));
+ server.listen(port, () => console.log(`connected with port ${port} ...`));
 
 
+io.on("connection",(socket) => {
+    console.log("User connected:" + socket.id);
 
+    socket.on("message", (data)=> {
+        socket.broadcast.emit("message",data);
+    })
+})
 
    
 
